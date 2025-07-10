@@ -46,7 +46,23 @@
             <com.github.kilnn.tool.widget.item.PreferenceItem
                 android:id="@+id/item_device_log"
                 style="@style/Widget.Sample.PreferenceView.Item.Text"
-                app:preferenceTitle="Device Log"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:preferenceTitle="Device Log" />
+
+            <com.github.kilnn.tool.widget.item.PreferenceItem
+                android:id="@+id/item_export"
+                style="@style/Widget.Sample.PreferenceView.Item.Text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:preferenceTitle="@string/account_export_data" />
+
+            <com.github.kilnn.tool.widget.item.PreferenceItem
+                android:id="@+id/item_import"
+                style="@style/Widget.Sample.PreferenceView.Item.Text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:preferenceTitle="@string/account_import_data" />
 
             <TextView
                 android:id="@+id/tv_device_log_state"

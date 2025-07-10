@@ -1,9 +1,11 @@
 package com.topstep.fitcloud.sample2.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -29,6 +31,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.asFlow
 import timber.log.Timber
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.*
 
 /**
@@ -116,6 +121,13 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
                 }, {
                     Timber.tag("itemDeviceLog").w(it)
                 })
+        }
+        viewBind.itemExport.clickTrigger {
+            val result = viewModel.backupDatabase(requireContext())
+            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+        }
+        viewBind.itemImport.clickTrigger {
+            // import
         }
         viewBind.btnSignOut.clickTrigger {
             viewModel.signOut()
@@ -226,6 +238,29 @@ class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState
             authManager.signOut()
         }.execute(SingleAsyncState<Unit>::async) {
             copy(async = it)
+        }
+    }
+
+    fun backupDatabase(context: Context): Boolean {
+        val dbName = "db_sample2"
+        val dbFile = context.getDatabasePath(dbName)
+        val backupDir = AppFiles.dirDownload(context) ?: return false
+        val backupFile = File(backupDir, "chroniax-backup.db")
+
+        return try {
+            FileInputStream(dbFile).use { src ->
+                FileOutputStream(backupFile).use { dst ->
+                    src.channel.use { inChannel ->
+                        dst.channel.use { outChannel ->
+                            inChannel.transferTo(0, inChannel.size(), outChannel)
+                        }
+                    }
+                }
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }

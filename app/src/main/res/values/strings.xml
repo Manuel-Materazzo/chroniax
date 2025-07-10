@@ -21,6 +21,8 @@
     <string name="account_sign_out">Sign out</string>
     <string name="account_sign_out_ing">Sign out…</string>
     <string name="account_edit_user_info">Edit User Info</string>
+    <string name="account_export_data">Export Data</string>
+    <string name="account_import_data">Import Data</string>
 
     <!--Error-->
     <string name="error_user_exist">User already exist</string>

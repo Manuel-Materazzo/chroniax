@@ -21,6 +21,8 @@
     <string name="account_sign_out">退出账号</string>
     <string name="account_sign_out_ing">退出账号…</string>
     <string name="account_edit_user_info">编辑个人资料</string>
+    <string name="account_export_data">Export Data</string>
+    <string name="account_import_data">Import Data</string>
 
     <!--Error-->
     <string name="error_user_exist">该用户已存在</string>
