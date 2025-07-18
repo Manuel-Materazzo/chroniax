@@ -3,6 +3,7 @@ package com.topstep.fitcloud.sample2.di
 import com.topstep.fitcloud.sample2.MyApplication
 import com.topstep.fitcloud.sample2.data.auth.AuthManager
 import com.topstep.fitcloud.sample2.data.config.ExerciseGoalRepository
+import com.topstep.fitcloud.sample2.data.db.AppDatabase
 import com.topstep.fitcloud.sample2.data.device.*
 import com.topstep.fitcloud.sample2.data.gps.GpsHotStartRepository
 import com.topstep.fitcloud.sample2.data.user.UserInfoRepository
@@ -33,6 +34,10 @@ object Injector {
 
     fun getUserInfoRepository(): UserInfoRepository {
         return SingleInstance.userInfoRepository
+    }
+
+    fun getAppDatabase(): AppDatabase {
+        return SingleInstance.appDatabase
     }
 
     fun getVersionRepository(): VersionRepository {

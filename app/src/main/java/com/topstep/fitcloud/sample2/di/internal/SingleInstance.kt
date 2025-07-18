@@ -24,7 +24,7 @@ object SingleInstance {
 
     private val applicationContext: Context = MyApplication.instance
 
-    private val appDatabase: AppDatabase by lazy {
+    val appDatabase: AppDatabase by lazy {
         AppDatabase.build(applicationContext, CoroutinesInstance.ioDispatcher, moshi)
     }
 

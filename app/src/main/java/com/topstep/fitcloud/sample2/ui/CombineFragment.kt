@@ -1,8 +1,11 @@
 package com.topstep.fitcloud.sample2.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -127,7 +130,9 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
             Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
         }
         viewBind.itemImport.clickTrigger {
-            // import
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "*/*"
+            startActivityForResult(intent, 777)
         }
         viewBind.btnSignOut.clickTrigger {
             viewModel.signOut()
@@ -164,6 +169,23 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
                     Log.e("Kilnn", "deviceInfo:$it")
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 777 && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data ?: return
+            val input = context?.contentResolver?.openInputStream(uri)!!
+            val file = File(context?.cacheDir, "temp_restore.db")
+            file.outputStream().use { output -> input.copyTo(output) }
+            viewModel.signOut()
+            val result = viewModel.restoreDatabase(requireContext(), file)
+            // Show a Toast with result
+            // Optionally: finishAffinity() or System.exit(0) to force app restart
+            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                requireActivity().finishAffinity()
+            }, 1500)
         }
     }
 
@@ -224,7 +246,9 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
 class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState()) {
 
     private val authManager = Injector.getAuthManager()
+    private val dbName = "db_sample2"
     val deviceManager = Injector.getDeviceManager()
+    private val appDatabase = Injector.getAppDatabase()
 
     //ToNote:Because convert as val parameter, so need Observable.defer{} to wrap it
     val flowDeviceInfo = Observable.defer {
@@ -242,7 +266,6 @@ class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState
     }
 
     fun backupDatabase(context: Context): Boolean {
-        val dbName = "db_sample2"
         val dbFile = context.getDatabasePath(dbName)
         val backupDir = AppFiles.dirDownload(context) ?: return false
         val backupFile = File(backupDir, "chroniax-backup.db")
@@ -257,6 +280,21 @@ class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState
                     }
                 }
             }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    fun restoreDatabase(context: Context, fromFile: File): Boolean {
+        val dbFile = context.getDatabasePath(dbName)
+
+        // Ensure DB is closed before restoring
+        appDatabase.close()
+
+        return try {
+            fromFile.copyTo(dbFile, overwrite = true)
             true
         } catch (e: Exception) {
             e.printStackTrace()
