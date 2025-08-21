@@ -10,12 +10,12 @@ kotlin {
 }
 android {
     namespace = "com.topstep.fitcloud.sample2"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.topstep.fitcloud.sample2"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 3
         versionName = "0.3"
         multiDexEnabled = true
@@ -33,6 +33,10 @@ android {
         buildConfig = true
         viewBinding = true
         compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     buildTypes {
@@ -161,6 +165,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.savedstate)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
+
+
+    // Jetpack Compose Runtime
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.ui.tooling.preview) // For previews
+    debugImplementation(libs.androidx.ui.tooling) // For tooling (inspector, etc.)
 
     //Moshi
     implementation(libs.moshi)

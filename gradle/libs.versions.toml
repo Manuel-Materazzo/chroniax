@@ -27,6 +27,8 @@ androidx-media = "1.6.0"
 androidx-palette = "1.0.0"
 google-material = "1.9.0"
 #Common
+material = "1.9.0"
+runtime = "1.9.0"
 timber = "5.0.1"
 permissionx = "1.7.1"
 mars-xlog = "1.2.5"
@@ -52,6 +54,7 @@ espresso-core = "3.5.1"
 robolectric = "4.9"
 mockito = "4.9.0"
 mockk = "1.12.5"
+ui = "1.9.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle" }
@@ -63,6 +66,11 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
 [libraries]
 #Android-Kotlin
+androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
+androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
+androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "ui" }
+androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "ui" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "kotlin-coroutines" }
 #AndroidX
