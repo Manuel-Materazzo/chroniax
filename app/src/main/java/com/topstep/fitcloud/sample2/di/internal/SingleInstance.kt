@@ -24,10 +24,6 @@ object SingleInstance {
 
     private val applicationContext: Context = MyApplication.instance
 
-    val appDatabase: AppDatabase by lazy {
-        AppDatabase.build(applicationContext, CoroutinesInstance.ioDispatcher, moshi)
-    }
-
     private val internalStorage: InternalStorage by lazy {
         InternalStorageImpl(applicationContext, CoroutinesInstance.applicationScope, CoroutinesInstance.applicationIOScope)
     }
@@ -41,6 +37,15 @@ object SingleInstance {
             .add(ListNullableJsonAdapterFactory)
             .add(ListNonNullJsonAdapterFactory)
             .build()
+    }
+
+    var appDatabase: AppDatabase = AppDatabase.build(applicationContext, CoroutinesInstance.ioDispatcher, moshi)
+        private set // Optional: to restrict setting from outside SingleInstance, though reinitializeAppDatabase will be public
+
+    fun reinitializeAppDatabase() {
+        if (!appDatabase.isOpen) { // Or some other way to check if it's closed, if available
+            appDatabase = AppDatabase.build(applicationContext, CoroutinesInstance.ioDispatcher, moshi)
+        }
     }
 
     val apiClient: ApiClient by lazy {

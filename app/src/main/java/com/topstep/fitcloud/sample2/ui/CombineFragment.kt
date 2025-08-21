@@ -76,14 +76,6 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
             uri?.let {
                 val result = viewModel.backupDatabase(requireContext(), it)
                 Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
-                if (result) {
-                    // Optionally, you can still finish a_string_var = """Hello World!"""
-// a_second_one = '''How's life?'''
-// another = "Yo!"the activity or do other actions upon successful backup
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        requireActivity().finishAffinity()
-                    }, 1500)
-                }
             }
         }
     }
@@ -204,9 +196,6 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
             // Show a Toast with result
             // Optionally: finishAffinity() or System.exit(0) to force app restart
             Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
-            Handler(Looper.getMainLooper()).postDelayed({
-                requireActivity().finishAffinity()
-            }, 1500)
         }
     }
 

@@ -37,6 +37,7 @@ object Injector {
     }
 
     fun getAppDatabase(): AppDatabase {
+        SingleInstance.reinitializeAppDatabase()
         return SingleInstance.appDatabase
     }
 
