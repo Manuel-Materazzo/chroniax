@@ -3,12 +3,15 @@ package com.topstep.fitcloud.sample2.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -65,6 +68,25 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
     private val viewBind: FragmentCombineBinding by viewBinding()
     private val viewModel by viewModels<CombineViewModel>()
     private val womenHealthRepository = Injector.getWomenHealthRepository()
+    private lateinit var backupDatabaseLauncher: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        backupDatabaseLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
+            uri?.let {
+                val result = viewModel.backupDatabase(requireContext(), it)
+                Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+                if (result) {
+                    // Optionally, you can still finish a_string_var = """Hello World!"""
+// a_second_one = '''How's life?'''
+// another = "Yo!"the activity or do other actions upon successful backup
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        requireActivity().finishAffinity()
+                    }, 1500)
+                }
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -126,15 +148,11 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
                 })
         }
         viewBind.itemExport.clickTrigger {
-            val result = viewModel.backupDatabase(requireContext())
-            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
-            Handler(Looper.getMainLooper()).postDelayed({
-                requireActivity().finishAffinity()
-            }, 1500)
+            backupDatabaseLauncher.launch("chroniax-backup.db")
         }
         viewBind.itemImport.clickTrigger {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*"
+            intent.type = "*/*" // Or specific MIME type for your db if known, e.g., "application/x-sqlite3"
             startActivityForResult(intent, 777)
         }
         viewBind.btnSignOut.clickTrigger {
@@ -268,23 +286,17 @@ class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState
         }
     }
 
-    fun backupDatabase(context: Context): Boolean {
+    fun backupDatabase(context: Context, destinationUri: Uri): Boolean {
         val dbFile = context.getDatabasePath(dbName)
-        val backupDir = AppFiles.dirDownload(context) ?: return false
-        val backupFile = File(backupDir, "chroniax-backup.db")
 
         // Ensure DB is closed before exporting
         appDatabase.close()
 
         return try {
             FileInputStream(dbFile).use { src ->
-                FileOutputStream(backupFile).use { dst ->
-                    src.channel.use { inChannel ->
-                        dst.channel.use { outChannel ->
-                            inChannel.transferTo(0, inChannel.size(), outChannel)
-                        }
-                    }
-                }
+                context.contentResolver.openOutputStream(destinationUri)?.use { dst ->
+                    src.copyTo(dst)
+                } ?: return false // Could not open output stream if openOutputStream returns null
             }
             true
         } catch (e: Exception) {
