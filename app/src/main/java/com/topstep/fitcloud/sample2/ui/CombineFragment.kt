@@ -128,6 +128,9 @@ class CombineFragment : BaseFragment(R.layout.fragment_combine) {
         viewBind.itemExport.clickTrigger {
             val result = viewModel.backupDatabase(requireContext())
             Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                requireActivity().finishAffinity()
+            }, 1500)
         }
         viewBind.itemImport.clickTrigger {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -269,6 +272,9 @@ class CombineViewModel : AsyncViewModel<SingleAsyncState<Unit>>(SingleAsyncState
         val dbFile = context.getDatabasePath(dbName)
         val backupDir = AppFiles.dirDownload(context) ?: return false
         val backupFile = File(backupDir, "chroniax-backup.db")
+
+        // Ensure DB is closed before exporting
+        appDatabase.close()
 
         return try {
             FileInputStream(dbFile).use { src ->
